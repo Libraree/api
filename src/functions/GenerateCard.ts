@@ -5,7 +5,7 @@ import Generator from '../services/CardGenerator';
 
 export async function GenerateCard(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // Get body, generate zip with signature, return.
-    const req = plainToClass(CardRequest, request.body);
+    const req = plainToClass(CardRequest, await request.json());
     const service = new Generator();
 
     return {
@@ -18,7 +18,7 @@ export async function GenerateCard(request: HttpRequest, context: InvocationCont
 };
 
 app.http('GenerateCard', {
-    methods: ['GET'],
+    methods: ['POST'],
     authLevel: 'function',
     handler: GenerateCard
 });
