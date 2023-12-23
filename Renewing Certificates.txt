@@ -1,0 +1,17 @@
+1. On a Mac, launch Keychain Access.
+2. Keychain Access > Certificate Assistant > Request a Certificate from a Certificate Authority
+3. My email address, Libraree as the Common Name and Saved To Disk.
+4. https://developer.apple.com/account/resources/certificates/list
+5. Click the add button.
+6. Choose "Pass Type ID Certificate".
+7. Give the name as "Production 20xx" (where 20xx is the current year).
+8. Choose the Libraree Pass Type ID.
+9. Upload the CSR.
+10. Download the certificate.
+11. Import the downloaded certificate into Keychain access. Choose the "login" group.
+12. Expand the certificate and export the private key as a P12 file.
+13. openssl pkcs12 -clcerts -nokeys -out certificate.pem -in Certificates.p12
+14. openssl pkcs12 -nocerts -out privatekey.pem -in Certificates.p12
+15. For the certificate and the private key, strip out the preamble and then do a regex find for \n and replace it with \\n.
+16. Store the values in local.settings.json
+17. Upload the new certificate and private key to the configuration page of the Azure Function. Choose the "Advanced Edit" mode.
