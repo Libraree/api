@@ -2,6 +2,7 @@ import GoogleService from './GoogleService';
 import _ from 'underscore';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
+import { TableClient, TableServiceClient } from '@azure/data-tables';
 
 export default class IsbnService {
     private googleService = new GoogleService();
@@ -30,23 +31,23 @@ export default class IsbnService {
         const promises = [];
 
         promises.push(this.googleService.getEditionsByIsbn(isbn));
-        promises.push(this.queryIsbnThing(isbn));
+        promises.push(this.queryIsbnDatabase(isbn));
 
         const result = await Promise.all(promises);
 
         return _.uniq(result.flat());
     }
 
-    private async queryIsbnThing(isbn: string): Promise<string[]> {
-        const response = await axios.get(`https://www.librarything.com/api/thingISBN/${isbn}`);
-        const isbnJs = await parseStringPromise(response.data);
-        const result = isbnJs.idlist.isbn;
+    private async queryIsbnDatabase(isbn: string): Promise<string[]> {
+        const tableService = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, 'Isbns');
 
-        return _.chain(result)
-            .map(x => x.length == 10 ? this.convertIsbn(x) : x)
-            .filter(x => x.indexOf('9780') == 0 || x.indexOf('9781') == 0)
-            .uniq()
-            .value()
-            .slice(0, 10);
+        try {
+            const entity = await tableService.getEntity(isbn.substring(0, 6), isbn.substring(6));
+            const related = JSON.parse(entity.Related as string) as string[];
+            return _.uniq(_.union([ isbn ], related)).slice(0, 10);
+        }
+        catch(e) {
+            return [ isbn ];
+        }
     }
 }

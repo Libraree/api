@@ -13,7 +13,7 @@
   "dependencies": {
     "@azure/data-tables": "^13.2.2",
     "@azure/functions": "^4.0.0",
-    "@libraree/uk-libraries-search": "^1.0.5",
+    "@libraree/uk-libraries-search": "^1.0.6",
     "axios": "^1.6.2",
     "bwip-js": "^4.1.2",
     "class-transformer": "^0.5.1",
